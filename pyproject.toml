@@ -7,8 +7,16 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+open3d = "^0.18.0"
+pandas = "^2.2.1"
+matplotlib = "^3.8.3"
+kivymd = "^1.2.0"
+customtkinter = "^5.2.2"
 
 
 [build-system]
-requires = ["poetry-core"]
+requires = [
+    "poetry-core",
+    "setuptools>=60",
+    "setuptools-scm>=8.0"]
 build-backend = "poetry.core.masonry.api"
