@@ -1,8 +1,12 @@
+import os.path
+
 import customtkinter as tk
 from tkinter import PhotoImage
 
 from simple_pcd_viewer.data_process import DataProcess
 from simple_pcd_viewer.window import PcdUiProcess
+
+ASSET_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "asset"))
 
 
 class TkController:
@@ -25,12 +29,12 @@ class TkController:
     def play_pause(self):
         self.playing.set(not self.playing.get())
         if self.playing.get():
-            self.button_play_pause.configure(image=PhotoImage(file="asset/pause.png"))
+            self.button_play_pause.configure(image=PhotoImage(file=ASSET_PATH + "/pause.png"))
 
             def play():
                 if self.index.get() >= self.data_process.config.frame_num - 1:
                     self.playing.set(False)
-                    self.button_play_pause.configure(image=PhotoImage(file="asset/play.png"))
+                    self.button_play_pause.configure(image=PhotoImage(file=ASSET_PATH + "/play.png"))
                     return
                 self.move_to(self.index.get() + 1)
                 if self.playing.get():
@@ -40,7 +44,7 @@ class TkController:
             if self.play_id is not None:
                 self.app.after_cancel(self.play_id)
                 self.play_id = None
-            self.button_play_pause.configure(image=PhotoImage(file="asset/play.png"))
+            self.button_play_pause.configure(image=PhotoImage(file=ASSET_PATH + "/play.png"))
 
     def move_to(self, index: int):
         if index < 0:
@@ -64,35 +68,35 @@ class TkController:
             self.app,
             text="",
             width=48,
-            image=PhotoImage(file="asset/skip_previous.png"),
+            image=PhotoImage(file=ASSET_PATH + "/skip_previous.png"),
             command=lambda: self.move_to(0))
         button_to_first.grid(row=0, column=0)
         button_previous = tk.CTkButton(
             self.app,
             text="",
             width=48,
-            image=PhotoImage(file="asset/chevron_left.png"),
+            image=PhotoImage(file=ASSET_PATH + "/chevron_left.png"),
             command=lambda: self.move_to(self.index.get() - 1))
         button_previous.grid(row=0, column=1)
         self.button_play_pause = tk.CTkButton(
             self.app,
             text="",
             width=48,
-            image=PhotoImage(file="asset/play.png"),
+            image=PhotoImage(file=ASSET_PATH + "/play.png"),
             command=self.play_pause)
         self.button_play_pause.grid(row=0, column=2)
         button_next = tk.CTkButton(
             self.app,
             text="",
             width=48,
-            image=PhotoImage(file="asset/chevron_right.png"),
+            image=PhotoImage(file=ASSET_PATH + "/chevron_right.png"),
             command=lambda: self.move_to(self.index.get() + 1))
         button_next.grid(row=0, column=3)
         button_to_last = tk.CTkButton(
             self.app,
             text="",
             width=48,
-            image=PhotoImage(file="asset/skip_next.png"),
+            image=PhotoImage(file=ASSET_PATH + "/skip_next.png"),
             command=lambda: self.move_to(self.data_process.config.frame_num - 1))
         button_to_last.grid(row=0, column=4)
 
