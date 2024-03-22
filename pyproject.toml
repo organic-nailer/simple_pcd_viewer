@@ -12,6 +12,7 @@ pandas = "^2.2.1"
 matplotlib = "^3.8.3"
 kivymd = "^1.2.0"
 customtkinter = "^5.2.2"
+tkfontawesome = "^0.2.0"
 
 
 [build-system]
