@@ -26,7 +26,11 @@ class CsvDataProvider:
             self,
             dir: str, name: str, length: int,
             filter: Optional[PcdFilter] = None,
-            transformer: Optional[PcdTransformer] = None):
+            transformer: Optional[PcdTransformer] = None,
+            debug: bool = False):
+        if debug:
+            print("CsvDataProvider.__init__")
+        self.debug = debug
         self._dir = dir
         self._name = name
         self._length = length
@@ -37,7 +41,10 @@ class CsvDataProvider:
     def get_at(self, index: int) -> Optional[pd.DataFrame]:
         if index >= self._length or index < 0:
             return None
-        df = pd.read_csv(f"{self._dir}/{self._name}/{self._name}_{index:04d}.csv", usecols=["x", "y", "z", "intensity"], dtype={"x": np.float64, "y": np.float64, "z": np.float64, "intensity": int})
+        filename = f"{self._dir}/{self._name}/{self._name}_{index:04d}.csv"
+        if self.debug:
+            print("CsvDataProvider.get_at:", filename)
+        df = pd.read_csv(filename, usecols=["x", "y", "z", "intensity"], dtype={"x": np.float64, "y": np.float64, "z": np.float64, "intensity": int})
         if self._filter is not None and not self._filter.filter(df):
             return None
         if self._transformer is not None:

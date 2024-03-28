@@ -26,7 +26,7 @@ class Open3dViewParameters:
 
 
 class PcdUiProcess:
-    def __init__(self, max_points_num: int = 57600):
+    def __init__(self, max_points_num: int = 57600, debug: bool = False):
         self.queue = Queue()
         self._finished = False
         self.current_status = Manager().dict()
@@ -39,7 +39,8 @@ class PcdUiProcess:
             self.current_status,
             max_points_num,
             self.stream_close_event,
-            self.window_close_event))
+            self.window_close_event,
+            debug))
         self._process.start()
 
     def update_points(self, points: np.ndarray, colors: np.ndarray):
@@ -58,7 +59,10 @@ def _pcd_ui_process_run(
         status: dict,
         max_points_num: int,
         stream_close_event: EventClass,
-        window_close_event: EventClass):
+        window_close_event: EventClass,
+        debug: bool):
+    if debug:
+        print("PcdUiProcess._pcd_ui_process_run")
     points = np.zeros((max_points_num, 3))
     colors = np.zeros((max_points_num, 3))
     vis = o3d.visualization.Visualizer()  # type: ignore
@@ -115,12 +119,16 @@ def _pcd_ui_process_run(
             if not vis.poll_events():
                 break
             vis.update_renderer()
+    except Exception as e:
+        print("PcdUiProcess: Error", e)
     finally:
         while not queue.empty():
             queue.get()
         queue.close()
         window_close_event.set()
         vis.destroy_window()
+        if debug:
+            print("PcdUiProcess Finished")
 
 
 def _gen_grid(pitch: float, length: int) -> o3d.geometry.LineSet:

@@ -6,7 +6,10 @@ from simple_pcd_viewer.window import PcdUiProcess
 
 
 class TkController:
-    def __init__(self, ui: PcdUiProcess, data_process: DataProcess):
+    def __init__(self, ui: PcdUiProcess, data_process: DataProcess, debug: bool = False):
+        if debug:
+            print("TkController.__init__")
+        self.debug = debug
         self.ui = ui
         self.data_process = data_process
         self.app = tk.CTk()
@@ -24,6 +27,8 @@ class TkController:
 
     def play_pause(self):
         self.playing.set(not self.playing.get())
+        if self.debug:
+            print("TkController.play_pause:", self.playing.get())
         if self.playing.get():
             self.button_play_pause.configure(image=icon_to_image("pause", fill="white", scale_to_height=24))
 
@@ -43,6 +48,8 @@ class TkController:
             self.button_play_pause.configure(image=icon_to_image("play", fill="white", scale_to_height=24))
 
     def move_to(self, index: int):
+        if self.debug:
+            print("TkController.move_to:", index)
         if index < 0:
             index = 0
         if index >= self.data_process.config.frame_num:
@@ -51,6 +58,8 @@ class TkController:
         self.data_process.request_frame(index)
 
     def show(self):
+        if self.debug:
+            print("TkController.show")
         self.app.title("Simple PCD Controller")
         self.app.geometry("600x300")
         self.app.attributes('-topmost', True)  # Always on top

@@ -7,22 +7,33 @@ from simple_pcd_viewer.window import PcdUiProcess
 
 
 class CsvVisualizer:
-    def __init__(self, dir: str, name: str, length: int, filter: PcdFilter, transformer: PcdTransformer):
+    def __init__(
+            self,
+            dir: str,
+            name: str,
+            length: int,
+            filter: PcdFilter,
+            transformer: PcdTransformer,
+            debug: bool = False):
+        if debug:
+            print("CsvVisualizer.__init__")
+        self.debug = debug
         self.data_provider = CsvDataProvider(
             dir, name, length,
             filter,
-            transformer)
+            transformer,
+            debug)
 
     def show(self):
         np.set_printoptions(precision=2, suppress=True)
 
-        ui = PcdUiProcess()
-        data_process = DataProcess(ui, self.data_provider, matplotlib.colormaps["cool"])
+        ui = PcdUiProcess(debug=self.debug)
+        data_process = DataProcess(ui, self.data_provider, matplotlib.colormaps["cool"], self.debug)
 
         try:
             data_process._process.start()
 
-            controller = TkController(ui, data_process)
+            controller = TkController(ui, data_process, self.debug)
             controller.show()
 
             # MainApp().run()

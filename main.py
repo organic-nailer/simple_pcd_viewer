@@ -16,7 +16,8 @@ def main():
     vis = spv.CsvVisualizer(
         ".", "0315", 290,
         FilterInvalid(),
-        TransformSample())
+        TransformSample(),
+        debug=True)
     vis.show()
 
 
