@@ -84,6 +84,7 @@ def _pcd_ui_process_run(
     # frame_num = 0
 
     is_first = True
+    prev_geometries = []
 
     try:
         while (not stream_close_event.is_set()) or (not queue.empty()):
@@ -99,18 +100,24 @@ def _pcd_ui_process_run(
             if not queue.empty():
                 # s = time.time()
                 while not queue.empty():
-                    points = queue.get()
-                    colors = queue.get()
+                    geometries = queue.get()
                 # print(f"Get Time: {time.time() - s:.5f}")
                 # s = time.time()
-                pcd.points = o3d.utility.Vector3dVector(points)
-                pcd.colors = o3d.utility.Vector3dVector(colors)
+                for g in prev_geometries:
+                    vis.remove_geometry(g, reset_bounding_box=False)
+                prev_geometries.clear()
+
+                for g in geometries:
+                    g = g.to_legacy()
+                    vis.add_geometry(g, reset_bounding_box=False)
+                    prev_geometries.append(g)
+
 
                 if is_first:
                     vis.reset_view_point(True)
                     is_first = False
                 # print(f"Transform Time: {time.time() - s:.5f}")
-                vis.update_geometry(pcd)
+                # vis.update_geometry(pcd)
                 # frame_num += 1
                 # if frame_num == frame_max:
                 #     print(f"FPS: {frame_max / (time.time() - start):.2f}")

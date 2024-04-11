@@ -4,6 +4,7 @@ import time
 
 from matplotlib.colors import Colormap
 import numpy as np
+import open3d as o3d
 
 from simple_pcd_viewer.csv_data_provider import CsvDataProvider
 from simple_pcd_viewer.window import PcdUiProcess
@@ -35,6 +36,8 @@ def _data_process_run(
         debug: bool):
     previous_frame = -1
 
+    device = o3d.core.Device("CPU:0")
+
     try:
         while True:
             if previous_frame == current_frame.value:
@@ -50,8 +53,12 @@ def _data_process_run(
 
             if debug:
                 print("DataProcess: Processing index", current_frame.value)
-            ui_queue.put(df[["x", "y", "z"]].values)
-            ui_queue.put(cmap(df["intensity"].values).astype(np.float64)[:, :3])  # type: ignore
+            pcd = o3d.t.geometry.PointCloud(device)
+            pcd.point.positions = o3d.core.Tensor(df[["x","y","z"]].values, o3d.core.float32, device)
+            pcd.point.colors = o3d.core.Tensor(cmap(df["intensity"].values)[:,:3], o3d.core.float32, device)  # type: ignore
+            ui_queue.put([pcd])
+            # ui_queue.put(df[["x", "y", "z"]].values)
+            # ui_queue.put(cmap(df["intensity"].values).astype(np.float64)[:, :3])  # type: ignore
     except Exception as e:
         print("DataProcess: Error", e)
     finally:
