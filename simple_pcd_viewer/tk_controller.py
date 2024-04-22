@@ -1,12 +1,12 @@
 import customtkinter as tk
 from tkfontawesome import icon_to_image
 
-from simple_pcd_viewer.data_process import DataProcess
-from simple_pcd_viewer.window import PcdUiProcess
+from .process_data import PcdDataProcess
+from .process_pcd_ui import PcdUiProcess
 
 
 class TkController:
-    def __init__(self, ui: PcdUiProcess, data_process: DataProcess, debug: bool = False):
+    def __init__(self, ui: PcdUiProcess, data_process: PcdDataProcess, debug: bool = False):
         if debug:
             print("TkController.__init__")
         self.debug = debug

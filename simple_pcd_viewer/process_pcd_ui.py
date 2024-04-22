@@ -43,10 +43,6 @@ class PcdUiProcess:
             debug))
         self._process.start()
 
-    def update_points(self, points: np.ndarray, colors: np.ndarray):
-        self.queue.put(points)
-        self.queue.put(colors)
-
     def close(self):
         self.stream_close_event.set()
 

@@ -6,20 +6,25 @@ from matplotlib.colors import Colormap
 import numpy as np
 import open3d as o3d
 
-from simple_pcd_viewer.csv_data_provider import CsvDataProvider
-from simple_pcd_viewer.window import PcdUiProcess
+from .process_pcd_ui import PcdUiProcess
+from .geometry_provider import GeometryProviderInterface
+from .pcd_data_config import PcdDataConfig
 
 
-class DataProcess:
-    def __init__(self, ui: PcdUiProcess, provider: CsvDataProvider, cmap: Colormap, debug: bool = False):
+class PcdDataProcess:
+    def __init__(self, 
+                 ui: PcdUiProcess,
+                 provider: list[GeometryProviderInterface],
+                 config: PcdDataConfig,
+                 debug: bool = False):
         if debug:
             print("DataProcess.__init__")
         self.stream_closed_event = Event()
-        self.current_frame = Manager().Value("i", 0)
-        self.config = provider.config
+        self.current_frame = Manager().Value("i", 1)
+        self.config = config
         self._process = Process(
             target=_data_process_run,
-            args=(provider, ui.queue, self.current_frame, cmap, debug))
+            args=(provider, ui.queue, self.current_frame, debug))
 
     def start(self):
         self._process.start()
@@ -29,14 +34,11 @@ class DataProcess:
 
 
 def _data_process_run(
-        provider: CsvDataProvider,
+        provider_list: list[GeometryProviderInterface],
         ui_queue: Queue,
         current_frame: ValueProxy[int],
-        cmap: Colormap,
         debug: bool):
     previous_frame = -1
-
-    device = o3d.core.Device("CPU:0")
 
     try:
         while True:
@@ -44,8 +46,17 @@ def _data_process_run(
                 time.sleep(0.01)
                 continue
             previous_frame = current_frame.value
-            df = provider.get_at(current_frame.value)
-            if df is None:
+
+            new_geometries = []
+            skipped = False
+            for provider in provider_list:
+                gs = provider.get_at(current_frame.value)
+                if provider.skip_frame_when_empty() and len(gs) == 0:
+                    skipped = True
+                    break
+                if gs is not None:
+                    new_geometries.extend(gs)
+            if skipped:
                 if debug:
                     print("DataProcess: Skipped index", current_frame.value)
                 time.sleep(0.01)
@@ -53,12 +64,7 @@ def _data_process_run(
 
             if debug:
                 print("DataProcess: Processing index", current_frame.value)
-            pcd = o3d.t.geometry.PointCloud(device)
-            pcd.point.positions = o3d.core.Tensor(df[["x","y","z"]].values, o3d.core.float32, device)
-            pcd.point.colors = o3d.core.Tensor(cmap(df["intensity"].values)[:,:3], o3d.core.float32, device)  # type: ignore
-            ui_queue.put([pcd])
-            # ui_queue.put(df[["x", "y", "z"]].values)
-            # ui_queue.put(cmap(df["intensity"].values).astype(np.float64)[:, :3])  # type: ignore
+            ui_queue.put(new_geometries)
     except Exception as e:
         print("DataProcess: Error", e)
     finally:
