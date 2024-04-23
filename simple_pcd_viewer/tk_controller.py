@@ -1,12 +1,12 @@
 import customtkinter as tk
 from tkfontawesome import icon_to_image
 
-from simple_pcd_viewer.data_process import DataProcess
-from simple_pcd_viewer.window import PcdUiProcess
+from .process_data import PcdDataProcess
+from .process_pcd_ui import PcdUiProcess
 
 
 class TkController:
-    def __init__(self, ui: PcdUiProcess, data_process: DataProcess, debug: bool = False):
+    def __init__(self, ui: PcdUiProcess, data_process: PcdDataProcess, debug: bool = False):
         if debug:
             print("TkController.__init__")
         self.debug = debug
@@ -115,7 +115,8 @@ class TkController:
         slider = tk.CTkSlider(
             self.app,
             variable=self.index,
-            from_=0, to=self.data_process.config.frame_num - 1,
+            state="normal" if self.data_process.config.frame_num > 1 else "disabled",
+            from_=0, to=max(self.data_process.config.frame_num - 1, 1),
             number_of_steps=self.data_process.config.frame_num,
             command=lambda value: self.move_to(int(value)))
         slider.grid(row=1, column=1, columnspan=4, sticky="ew")
