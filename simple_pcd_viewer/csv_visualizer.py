@@ -1,4 +1,3 @@
-import matplotlib
 import numpy as np
 from .tk_controller import TkController
 from .csv_data_provider import CsvDataProvider, PcdFilter, PcdTransformer

@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import open3d as o3d
 import matplotlib.cm
+import matplotlib.colors
 
 from .pcd_data_config import PcdDataConfig
 from .geometry_provider import GeometryProviderInterface
@@ -40,7 +41,7 @@ class CsvDataProvider(GeometryProviderInterface):
         self._filter = filter
         self._transformer = transformer
         self.config: PcdDataConfig = PcdDataConfig(name, 57600, length, 10.0)
-        self.cmap = matplotlib.cm.get_cmap("viridis")
+        self.cmap = matplotlib.colormaps["viridis"]
 
     def get_at(self, index: int) -> list[o3d.t.geometry.PointCloud]:
         if index >= self._length or index < 0:
@@ -61,7 +62,7 @@ class CsvDataProvider(GeometryProviderInterface):
 
         pcd = o3d.t.geometry.PointCloud()
         pcd.point.positions = o3d.core.Tensor(df[["x", "y", "z"]].values, dtype=o3d.core.Dtype.Float64)
-        pcd.point.colors = o3d.core.Tensor(self.cmap(df["intensity"].values / 255)[:, :3], dtype=o3d.core.Dtype.Float32)
+        pcd.point.colors = o3d.core.Tensor(self.cmap(np.array(df["intensity"].values) / 255)[:, :3], dtype=o3d.core.Dtype.Float32)
         return [pcd]
     
     def skip_frame_when_empty(self) -> bool:

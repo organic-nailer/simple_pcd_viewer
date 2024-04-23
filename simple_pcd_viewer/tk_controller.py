@@ -115,7 +115,8 @@ class TkController:
         slider = tk.CTkSlider(
             self.app,
             variable=self.index,
-            from_=0, to=self.data_process.config.frame_num - 1,
+            state="normal" if self.data_process.config.frame_num > 1 else "disabled",
+            from_=0, to=max(self.data_process.config.frame_num - 1, 1),
             number_of_steps=self.data_process.config.frame_num,
             command=lambda value: self.move_to(int(value)))
         slider.grid(row=1, column=1, columnspan=4, sticky="ew")

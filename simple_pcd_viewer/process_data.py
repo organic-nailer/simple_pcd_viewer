@@ -16,11 +16,12 @@ class PcdDataProcess:
                  ui: PcdUiProcess,
                  provider: list[GeometryProviderInterface],
                  config: PcdDataConfig,
+                 first_frame: int = 1,
                  debug: bool = False):
         if debug:
             print("DataProcess.__init__")
         self.stream_closed_event = Event()
-        self.current_frame = Manager().Value("i", 1)
+        self.current_frame = Manager().Value("i", first_frame)
         self.config = config
         self._process = Process(
             target=_data_process_run,
