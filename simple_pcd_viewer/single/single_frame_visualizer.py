@@ -1,4 +1,5 @@
 from typing import Optional
+import time
 
 from simple_pcd_viewer.pcd_data_config import PcdDataConfig
 from simple_pcd_viewer.process_pcd_ui import PcdUiProcess
@@ -18,7 +19,7 @@ class SingleFrameVisualizer:
         self.data = data
         self.rule = rule if rule is not None else PcdReadingRule()
 
-    def show(self):
+    def show(self, show_controller: bool = True):
         provider = SingleDataProvider(self.data, self.rule, debug=self.debug)
 
         ui = PcdUiProcess(debug=self.debug)
@@ -28,8 +29,13 @@ class SingleFrameVisualizer:
         try:
             data_process.start()
 
-            controller = TkController(ui, data_process, self.debug)
-            controller.show()
+            if show_controller:
+                controller = TkController(ui, data_process, self.debug)
+                controller.show()
+            else:
+                while not ui.window_close_event.is_set():
+                    time.sleep(0.5)
+                    pass
 
         finally:
             ui.close()

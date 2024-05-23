@@ -8,7 +8,7 @@ filename = os.path.dirname(__file__).replace("\\", "/") + "/data.csv"
 
 def main():
     vis = spv.single.SingleFrameVisualizer(filename, debug=True)
-    vis.show()
+    vis.show(show_controller=False)
 
 if __name__ == "__main__":
     main()
