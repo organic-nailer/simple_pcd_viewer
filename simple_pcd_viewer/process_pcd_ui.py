@@ -3,28 +3,6 @@ from multiprocessing.synchronize import Event as EventClass
 import numpy as np
 import open3d as o3d
 
-
-class Open3dViewParameters:
-    def __init__(
-            self,
-            fov: float,
-            zoom: float,
-            lookat: np.ndarray,
-            front: np.ndarray,
-            ):
-        self.fov = fov
-        self.zoom = zoom
-        self.lookat = lookat
-        self.front = front
-
-    @classmethod
-    def from_camera_parameters(cls, intrinsic: np.ndarray, extrinsic: np.ndarray, fov: float):
-        lookat = extrinsic[:3, 3]
-        front = -extrinsic[:3, :3] @ np.array([0, 0, 1])
-        zoom = intrinsic[0, 0] / 1000
-        return cls(fov, zoom, lookat, front)
-
-
 class PcdUiProcess:
     def __init__(self, max_points_num: int = 57600, debug: bool = False):
         self.queue = Queue()
