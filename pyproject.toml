@@ -1,18 +1,19 @@
 [tool.poetry]
 name = "simple-pcd-viewer"
-version = "0.2.0"
+version = "0.4.0"
 description = ""
 authors = ["organic-nailer <hykwyuk0125@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-open3d = "^0.18.0"
+python = ">=3.9"
+open3d = ">=0.18.0"
 pandas = "^2.2.1"
 matplotlib = "^3.8.3"
-kivymd = "^1.2.0"
 customtkinter = "^5.2.2"
 tkfontawesome = "^0.2.0"
+h5py = "^3.12.1"
+numpy = "^1.26.0"
 
 
 [build-system]
